@@ -1,0 +1,18 @@
+INSTRUCCIONES DE INSTALACION Y DEFENSA (XAMPP / WAMP)
+=====================================================
+1. Descomprimir la carpeta 'sistema_compras_stock' dentro de:
+   C:\xampp\htdocs\sistema_compras_stock
+
+2. Iniciar los servicios Apache y MySQL desde el Panel de Control de XAMPP.
+
+3. Abrir phpMyAdmin en el navegador: http://localhost/phpmyadmin
+   - Ir a la pestaña 'Importar'.
+   - Seleccionar el archivo 'database.sql' incluido en la raíz del proyecto.
+   - Hacer clic en 'Continuar' (crea automáticamente la BD, tablas, vistas v_compras / v_det_compra y el trigger borrar_temp).
+
+4. Ingresar al sistema desde el navegador:
+   http://localhost/sistema_compras_stock
+
+5. Credenciales de acceso por defecto:
+   - Usuario: admin
+   - Contraseña: admin
