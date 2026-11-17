@@ -44,7 +44,56 @@ if (empty($_SESSION['username']) && empty($_SESSION['password'])) {
     </aside>
 
     <div class="content-wrapper">
-      <?php include "content.php"; ?>
+      <?php 
+      $module = isset($_GET['module']) ? $_GET['module'] : 'start';
+      
+      $nivel = isset($_SESSION['nivel']) ? strtolower(trim($_SESSION['nivel'])) : ''; 
+      $permisos = isset($_SESSION['permisos']) ? strtolower(trim($_SESSION['permisos'])) : '';
+      $username = isset($_SESSION['username']) ? trim($_SESSION['username']) : '';
+
+      // Identificación de perfiles
+      $es_admin = ($username == 'admin' || strpos($nivel, 'admin') !== false || strpos($nivel, 'super') !== false || strpos($nivel, 'general') !== false);
+      $es_almacen = ($username == 'operador1' || strpos($nivel, 'almacen') !== false || strpos($nivel, 'almacén') !== false);
+      $es_compras = ($username == 'operador2' || strpos($nivel, 'compra') !== false);
+
+      // Bloqueos estrictos por rol
+      $bloquear = false;
+      $mensaje_bloqueo = "";
+
+      if ($es_almacen) {
+          // Almacén SOLO puede ver: inicio, stock, cambiar contraseña y password
+          $permitidos_almacen = ['start', 'stock', 'password'];
+          if (!in_array($module, $permitidos_almacen)) {
+              $bloquear = true;
+              $mensaje_bloqueo = "Tu rol de Almacén solo permite acceder al Stock de Productos y a la página de Inicio.";
+          }
+      } elseif ($es_compras) {
+          // Compras NO puede ver gestión de usuarios ni referenciales de administración profunda
+          $prohibidos_compras = ['user', 'form_user'];
+          if (in_array($module, $prohibidos_compras)) {
+              $bloquear = true;
+              $mensaje_bloqueo = "Tu rol de Compras no tiene permisos para acceder al módulo de gestión de usuarios.";
+          }
+      }
+
+      // Si intenta entrar a un módulo no autorizado, se le niega el acceso
+      if ($bloquear) {
+          echo '
+          <section class="content-header">
+            <h1>Acceso Denegado</h1>
+          </section>
+          <section class="content">
+            <div class="alert alert-danger alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+              <h4><i class="icon fa fa-ban"></i> ¡Atención!</h4>
+              ' . $mensaje_bloqueo . '
+            </div>
+          </section>';
+      } else {
+          // Si pasa las validaciones, carga el contenido con normalidad
+          include "content.php";
+      }
+      ?>
 
       <div class="modal fade" id="logout">
         <div class="modal-dialog">
@@ -64,7 +113,7 @@ if (empty($_SESSION['username']) && empty($_SESSION['password'])) {
     </div>
 
     <footer class="main-footer">
-      <strong>Copyright &copy; <?php echo date('Y'); ?> - Sistema Web de Compras y Stock</strong>
+      <strong>Copyright &copy; <?php echo date('Y'); ?> Sistema Web de Compras y Stock</strong>
     </footer>
   </div>
 
